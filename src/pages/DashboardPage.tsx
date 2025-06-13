@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { generateLoanData, LoanRecord } from "../data/loanData";
+import { LoanRecord } from "../data/loanData";
 import LoanTable from "../components/LoanTable";
 import { GridPaginationModel } from "@mui/x-data-grid";
 import LoanFilter from "../components/LoanFilter";
@@ -17,18 +17,22 @@ const DashboardPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    try {
-      setLoading(true);
-      setTimeout(() => {
-        const data = generateLoanData(500);
+    const fetchLoans = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:5050/api/loans");
+        const data = await response.json();
         setLoans(data);
         setFiltered(data);
         setLoading(false);
-      }, 1000);
-    } catch {
-      setError(true);
-      setLoading(false);
-    }
+      } catch (err) {
+        console.error("Error fetching loan data", err);
+        setError(true);
+        setLoading(false);
+      }
+    };
+
+    fetchLoans();
   }, []);
 
   useEffect(() => {
